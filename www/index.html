@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="Administrator Screen for B-Swell">
+    <meta name="author" content="John Caine">
+
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
+    <script>
+
+    var config = {
+      apiKey: " AIzaSyB-vtP3M3C-qBLvWVglnyfmFTk5botFq2U",
+      authDomain: "bluewatch-c0ff4.firebaseapp.com",
+      databaseURL: "https://bluewatch-c0ff4.firebaseio.com",
+      messagingSenderId: "263209043357",
+    };
+    firebase.initializeApp(config);
+    var database = firebase.database();
+    var devicesFbSnapshot;
+
+    function refreshDeviceUI() {
+      for (var n=0; n<10; n++) {
+      //  document.getElementById('device'+n).style.visibility='hidden';
+      }
+      for (var n in devicesFbSnapshot) {
+
+        var newDiv = document.createElement("div");
+        newDiv.className = "col-md-2";
+        newDiv.id = 'device'+n;
+        newDiv.innerHTML = devicesFbSnapshot[n].name;
+        var parentDiv = document.querySelector(".row");
+        parentDiv.appendChild(newDiv);
+
+        if (devicesFbSnapshot[n].isConnected) {
+          document.getElementById('device'+n).style.background="#96c4d3";
+        }
+        else {
+          document.getElementById('device'+n).style.background="#eeeeee";
+        }
+
+        document.getElementById('device'+n).style.visibility='visible';
+      }
+    }
+
+     function toggleSignIn() {
+       if (!firebase.auth().currentUser) {
+         var provider = new firebase.auth.GoogleAuthProvider();
+         provider.addScope('https://www.googleapis.com/auth/plus.login');
+         firebase.auth().signInWithRedirect(provider);
+       } else {
+         firebase.auth().signOut();
+       }
+     }
+
+      function initApp() {
+        firebase.auth().getRedirectResult().then(function(result) {
+          if (result.credential) {
+            var token = result.credential.accessToken;
+          } else {
+            document.getElementById('headline').textContent = 'Please sign in';
+            document.getElementById('intro').textContent='To see devices being monitored, please sign in below.';
+
+          }
+        }).catch(function(error) {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          var email = error.email;
+          var credential = error.credential;
+          console.error(error);
+        });
+
+        // Listening for auth state changes.
+        // [START authstatelistener]
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var emailVerified = user.emailVerified;
+            var photoURL = user.photoURL;
+            var isAnonymous = user.isAnonymous;
+            var uid = user.uid;
+            var providerData = user.providerData;
+            document.getElementById('headline').textContent = 'Hello, '+displayName;
+            document.getElementById('sign-in').textContent = 'Sign Out';
+            document.getElementById('intro').textContent='Here are the devices currently being monitored:';
+
+            firebase.database().ref('devices').on('value', function(snapshot) {
+              devicesFbSnapshot=snapshot.val();
+              refreshDeviceUI();
+
+              document.getElementById('devices').visibility='visible';
+
+            });
+
+
+                // [END_EXCLUDE]
+              } else {
+                // User is signed out.
+                document.getElementById('sign-in').textContent = 'Sign In';
+
+              }
+              document.getElementById('sign-in').disabled = false;
+            });
+            document.getElementById('sign-in').addEventListener('click', toggleSignIn, false);
+          }
+
+          window.onload = function() { initApp(); };
+        </script>
+
+
+    <meta charset="utf-8">
+    <title>Be Swell.</title>
+    <style media="screen">
+      h4 {
+          margin-top: 25px;
+      }
+
+      .row {
+          margin-bottom: 20px;
+      }
+
+      .row .row {
+          margin-top: 10px;
+          margin-bottom: 0;
+      }
+
+      #devices {
+        visibility: hidden;
+      }
+
+      [class * ="col-"] {
+          padding-top: 15px;
+          padding-bottom: 15px;
+          background-color: #eee;
+          background-color: rgba(86, 61, 124, .15);
+          border: 1px solid #ddd;
+          border: 1px solid rgba(86, 61, 124, .2);
+      }
+    </style>
+
+    <link rel="icon" href="favicon.ico">
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+        <div class="container">
+
+          <div class="page-header">
+            <h1 id="headline">Hello</h1>
+            <p class="lead" id="intro"></p>
+          </div>
+
+          <h3>Three equal columns</h3>
+          <div class="row" id="devices"></div>
+
+          <button disabled id="sign-in">Sign In</button>
+
+        </div> <!-- /container -->
+  </body>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+</html>

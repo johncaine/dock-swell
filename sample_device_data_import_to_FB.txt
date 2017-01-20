@@ -1,0 +1,17 @@
+{
+  "devices": [ {
+      "serial": "SERIALNUMBER",
+      "phone": "5555551212",
+      "name": "User's iPhone",
+      "isMonitored": true,
+      "alertsEnabled": true,
+      "dockRequiredStart": "18:05-05",
+      "dockRequiredDurationMinutes": "480",
+      "owner": "User",
+      "isCurrentlyDocked": false
+      }
+      ],
+    "violationTexts": [
+      "5555551313"
+    ]
+}
