@@ -1,1 +1,2 @@
 honor the is_monitored flag
+migrate the app setup options into a common file (to simplify setup)
