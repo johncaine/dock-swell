@@ -1,0 +1,13 @@
+Insallation Instructions
+
+npm install
+
+set up a firebase project and import sample_device_data_import_to_FB.txt
+
+in lib/firebase.js, replace:
+  FIREBASE_USER_NAME with your e-mail address
+  FIREBASE_USER_PASS with your firebase password
+  
+in lib/messages
+  var accountSid = 'TWILIO_SID';
+  var authToken = 'TWILIO_TOKEN';
